@@ -39,11 +39,19 @@ options:
  examples :
  
  python ../fill_ini_file.py file_one.txt file_one.ini 
- # thats will create file_one_ini have words in file_one.txt
+ thats will create file_one_ini have words in file_one.txt
  
  python ../translate.py file_one.txt file_one.ini -fl 3 -o new.txt
- # that will change words in txt depending on ini file if word exist in ini file
+ that will change words in txt depending on ini file if word exist in ini file
  
  all examples in example file (not alot :) 
   
  you can use this for encrype some thing 
+
+---—
+
+todo :
+- [ ] split symbols with space
+- [ ] add reverse method in translate file
+- [ ] make code more readable
+- [ ] 
