@@ -54,4 +54,5 @@ todo :
 - [ ] split symbols with space
 - [ ] add reverse method in translate file
 - [ ] make code more readable
-- [ ] 
+- [ ] use object to easy maintenance and development
+- [ ] add part of string (more than one word without space)
