@@ -4,10 +4,9 @@ def get_args() -> argparse.ArgumentParser:
     #python translate.py originfile inifile.ini [[-fl] fromline] [[-tl] toline] [-i]
     args_parser = argparse.ArgumentParser()
     boolean=argparse.BooleanOptionalAction
-    boolean
 
-    args_parser.add_argument("origin_file_path", help="this origen file path")
-    args_parser.add_argument("ini_file_path", help="this ini file path")
+    args_parser.add_argument("origin_file_path", help="this origen file path",type=str )
+    args_parser.add_argument("ini_file_path", help="this ini file path",type=str)
     args_parser.add_argument('-c',dest="case_sensitive" ,help="case sensitive", action=boolean, default=False)
     #args_parser.add_argument('-r',dest="reverse" ,help="reverse translate",action=boolean, default=False)
     args_parser.add_argument("-fl", "--from_line", dest="from_line", help="from line int start 1",type=int, default=0)
@@ -15,6 +14,10 @@ def get_args() -> argparse.ArgumentParser:
     args_parser.add_argument("-sh", "--show", dest="show", help="show the txt",type=int, action=boolean, default=1)
     args_parser.add_argument("-w", "--write", dest="write", help="write to origin file",type=int, action=boolean,  default=0)
     args_parser.add_argument("-o", "--output", dest="output", help="chose outher file to save output", default="")
+    args_parser.add_argument("-b", "--backup", dest="backup", help="save backup file if you choose write", default=1, action=boolean)
+    args_parser.add_argument("-re_s", "--regex_search", dest="regex_search", help="regex for sellect key from txt", default="")
+    args_parser.add_argument("-re_fi", "--regex_fill_value", dest="regex_fill_value", help="regex for set value to key ini_file", default="")
+
 
     return args_parser.parse_args()
 
@@ -23,14 +26,18 @@ def get_args() -> argparse.ArgumentParser:
 def read_origin_file(args) -> str:
     # read to dict
     # if we need append will read with configparser to auto fill ini file
+
     path_file = args.origin_file_path
 
-    txt_split_list = [line.split()  for line in open(path_file, "r").read().split("\n")]
+    txt = open(path_file, "r").read()
+
+    txt_split_list = [line.split()  for line in txt.split("\n")]
+
 
     #print("test = ", txt)
 
     #print(txt_lines)
-    return txt_split_list
+    return txt_split_list, txt
 
 
 
@@ -61,16 +68,23 @@ def update_txt(txt, config) -> None:
     #print("text after edit =", *txt)
     #print(list(config['DEFAULT'].keys()))
 
-def write_to_file(txt, args) -> None:
+def write_to_file(txt,origin_txt, args) -> None:
 
+    txt_temp = txt
 
     txt = "\n".join([" ".join(line)  for line in txt])
     if args.show == True:
-        print(txt)
+        txt_temp = [" ".join(line)  for line in txt_temp]
+        #print (txt)
+        for num, line in enumerate(txt_temp):
+            print(num+1, line)
+
+    if args.backup:
+            open(args.origin_file_path+".bcakup", "w")
 
     if args.write == True:
         #print(txt)
-        open(args.orignal_file_path, 'w').write(txt)
+        open(args.origin_file_path, 'w').write(txt)
 
     if args.output:
         open(args.output, 'w').write(txt)
@@ -86,7 +100,7 @@ if __name__ == "__main__":
 
     config.read(args.ini_file_path)
 
-    txt  = read_origin_file(args)
+    txt, origin_txt  = read_origin_file(args)
 
     update_txt(txt, config)
 
