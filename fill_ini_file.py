@@ -10,12 +10,14 @@ def get_args() -> argparse.ArgumentParser:
     args_parser.add_argument('-c',dest="case_sensitive" ,help="case sensitive",
                              action=boolean, default=False)
     args_parser.add_argument('-l',"--load_ini_file",dest="load_ini_file" ,help="load ini file "
-                             ,action=boolean, default=True)
+                             ,action=boolean, default=False)
     args_parser.add_argument("-w", "--write", dest="write", help="write to origin file",type=int, action=boolean,  default=0)
     args_parser.add_argument("-o", "--output", dest="output", help="chose other file to save output", default="")
     args_parser.add_argument("-sh", "--show", dest="show", help="show the txt",type=int, action=boolean, default=1)
-    args_parser.add_argument("-re_s", "--regex_search", dest="regex_search", help="regex for sellect key from txt", default="")
-    args_parser.add_argument("-re_fi", "--regex_fill_value", dest="regex_fill_value", help="regex for set value to key ini_file", default="")
+    args_parser.add_argument("-regex_s", "--regex_search", dest="regex_search", help="regex for sellect key from txt", default="")
+
+    #reg_replce = args_parser.add_subparsers("-regex_r", "--regex_replace", help="replace char in key to set in value",dest=regex_set_value, de#ult=None)
+    args_parser .add_argument("-regex_r", "--regex_replce", dest="regex_set_value", help="regex for set value to key ini_file", default=None)
 
 
 
@@ -30,6 +32,7 @@ def read_origin_file(args) -> str:
     case_sensitive = args.case_sensitive
     path_file = args.origin_file_path
 
+    #print(re.findall(args.regex_search, open(path_file, "r").read()))
     txt = [word for word in open(path_file, "r").read().split()
                if word!="\n"]
 
@@ -39,18 +42,21 @@ def read_origin_file(args) -> str:
     return txt
 
 
-def update_dict(txt,args, config) -> None:
+def update_dict(txt, args, config) -> None:
     #config.add_section('DEFAULT')a
 
     search_regex = args.regex_search
     set_value_regex = args.regex_set_value
-    if search_regex == "": set_value_regex= ""
+    if search_regex == "": set_value_regex= None
 
     keys = config['DEFAULT'].keys()
 
+    #print(txt)
     for word in txt:
         if word not in keys and re.search(search_regex, word):
-          config['DEFAULT'][word] = re.sub(search_regex, set_value_regex, work)
+          config['DEFAULT'][word] = re.sub(search_regex, set_value_regex, word)\
+          if set_value_regex != None \
+          else ""
 
     #print(list(config['DEFAULT'].keys()))
 
@@ -66,7 +72,7 @@ def write_to_ini_file(args, config) -> None:
             config.write(f)
 
     if args.show:
-        print("\n".join(config['DEFAULT'].keys()))
+        print("\n".join([ f"{k} : {y}" for k,y in config['DEFAULT'].items()]))
 
 if __name__ == "__main__":
     args =get_args()

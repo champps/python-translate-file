@@ -14,9 +14,7 @@ def get_args() -> argparse.ArgumentParser:
     args_parser.add_argument("-sh", "--show", dest="show", help="show the txt",type=int, action=boolean, default=1)
     args_parser.add_argument("-w", "--write", dest="write", help="write to origin file",type=int, action=boolean,  default=0)
     args_parser.add_argument("-o", "--output", dest="output", help="chose outher file to save output", default="")
-    args_parser.add_argument("-b", "--backup", dest="backup", help="save backup file if you choose write", default=1, action=boolean)
-    args_parser.add_argument("-re_s", "--regex_search", dest="regex_search", help="regex for sellect key from txt", default="")
-    args_parser.add_argument("-re_fi", "--regex_fill_value", dest="regex_fill_value", help="regex for set value to key ini_file", default="")
+    args_parser.add_argument("-b", "--backup", dest="backup", help="save backup file if you choose write", default=None)
 
 
     return args_parser.parse_args()
@@ -41,7 +39,7 @@ def read_origin_file(args) -> str:
 
 
 
-def update_txt(txt, config) -> None:
+def update_txt(txt,args, config) -> None:
     #config.add_section('DEFAULT')
     case_sensitive = args.case_sensitive
     from_line = args.from_line#1 if args.from_line else args.from_line
@@ -79,8 +77,11 @@ def write_to_file(txt,origin_txt, args) -> None:
         for num, line in enumerate(txt_temp):
             print(num+1, line)
 
-    if args.backup:
-            open(args.origin_file_path+".bcakup", "w")
+    if args.backup == "":
+        open(args.origin_file_path+".bcakup", "w")
+    elif args.backup:
+        open(args.backup, "w")
+
 
     if args.write == True:
         #print(txt)
@@ -102,8 +103,8 @@ if __name__ == "__main__":
 
     txt, origin_txt  = read_origin_file(args)
 
-    update_txt(txt, config)
+    update_txt(txt, args,  config)
 
-    write_to_file(txt, args)
+    write_to_file(txt, origin_txt,  args)
 
     #print(txt, args)
